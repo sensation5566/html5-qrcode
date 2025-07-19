@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Store Check-in</title>
+</head>
+<body>
+    <h1>Store Check-in</h1>
+    <div id="qr-reader" style="width:500px"></div>
+    <div id="status" style="margin-top:20px;font-weight:bold;"></div>
+    <script src="/html5-qrcode.min.js"></script>
+    <script>
+    const STORE_NAME = 'Store-A';
+    const PARTICIPANTS = ['P001','P002','P003'];
+
+    function updateCheckin(id) {
+        let checkins = JSON.parse(localStorage.getItem('checkins') || '{}');
+        if (!checkins[id]) checkins[id] = [];
+        if (!checkins[id].includes(STORE_NAME)) {
+            checkins[id].push(STORE_NAME);
+            localStorage.setItem('checkins', JSON.stringify(checkins));
+        }
+    }
+
+    function setStatus(msg, ok) {
+        const el = document.getElementById('status');
+        el.style.color = ok ? 'green' : 'red';
+        el.textContent = msg;
+    }
+
+    function onScanSuccess(decodedText) {
+        if (PARTICIPANTS.includes(decodedText)) {
+            updateCheckin(decodedText);
+            setStatus(`Participant ${decodedText} registered`, true);
+        } else {
+            setStatus('Invalid participant ID', false);
+        }
+    }
+
+    const scanner = new Html5QrcodeScanner('qr-reader', { fps: 10, qrbox: 250 });
+    scanner.render(onScanSuccess);
+    </script>
+</body>
+</html>

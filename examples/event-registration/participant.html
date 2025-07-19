@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Participant Check-ins</title>
+</head>
+<body>
+    <h1>Participant Portal</h1>
+    <div id="qr-reader" style="width:500px"></div>
+    <div id="info" style="margin-top:20px;font-weight:bold;"></div>
+    <script src="/html5-qrcode.min.js"></script>
+    <script>
+    function getCheckins(id) {
+        const checkins = JSON.parse(localStorage.getItem('checkins') || '{}');
+        return checkins[id] || [];
+    }
+
+    function setInfo(msg) {
+        document.getElementById('info').textContent = msg;
+    }
+
+    function onScanSuccess(decodedText) {
+        const visits = getCheckins(decodedText);
+        setInfo(`Visited ${visits.length} store(s)`);
+    }
+
+    const scanner = new Html5QrcodeScanner('qr-reader', { fps: 10, qrbox: 250 });
+    scanner.render(onScanSuccess);
+    </script>
+</body>
+</html>
