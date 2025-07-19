@@ -22,25 +22,15 @@
     <script>
     const TOTAL_STORES = 56;
 
-    function loadTotals() {
-        const checkins = JSON.parse(localStorage.getItem('checkins') || '{}');
-        const totals = new Array(TOTAL_STORES).fill(0);
-        const lists = Array.from({length: TOTAL_STORES}, () => []);
-        for (const id in checkins) {
-            const visits = checkins[id];
-            visits.forEach((v, i) => {
-                if (v) {
-                    totals[i]++;
-                    lists[i].push(id);
-                }
-            });
-        }
-        return {totals, lists};
+    async function loadTotals() {
+        const res = await fetch('/stats');
+        if (!res.ok) throw new Error('Server error');
+        return res.json();
     }
 
-    function populateTable() {
+    async function populateTable() {
         const tbody = document.querySelector('#summary-table tbody');
-        const {totals, lists} = loadTotals();
+        const {totals, lists} = await loadTotals();
         tbody.innerHTML = '';
         for (let i = 0; i < TOTAL_STORES; i++) {
             const tr = document.createElement('tr');

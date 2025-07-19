@@ -24,17 +24,15 @@
     // Update this list with the participant IDs encoded in your QR codes
     const PARTICIPANTS = ['P001','P002','P003'];
 
-    function updateCheckin(id) {
-        let checkins = JSON.parse(localStorage.getItem('checkins') || '{}');
-        if (!checkins[id]) {
-            checkins[id] = new Array(TOTAL_STORES).fill(false);
-        }
-        const already = checkins[id][storeNum - 1];
-        if (!already) {
-            checkins[id][storeNum - 1] = true;
-            localStorage.setItem('checkins', JSON.stringify(checkins));
-        }
-        return already;
+    async function updateCheckin(id) {
+        const res = await fetch('/checkin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, store: storeNum })
+        });
+        if (!res.ok) throw new Error('Server error');
+        const data = await res.json();
+        return data.already;
     }
 
     function setStatus(msg, ok) {
@@ -48,19 +46,23 @@
     }
 
     let resumeTimeout = null;
-    function onScanSuccess(decodedText) {
+    async function onScanSuccess(decodedText) {
         if (resumeTimeout) return;
         html5QrCode.pause(true);
 
         let pauseMs = 1000;
         if (PARTICIPANTS.includes(decodedText)) {
-            const already = updateCheckin(decodedText);
-            if (already) {
-                setStatus(`${decodedText} \u4e4b\u524d\u5df2\u7d93\u767b\u9304\u904e`, false);
-                pauseMs = 1000;
-            } else {
-                setStatus(`\u53c3\u52a0\u8005${decodedText} \u767b\u9304\u6210\u529f`, true);
-                pauseMs = 3000;
+            try {
+                const already = await updateCheckin(decodedText);
+                if (already) {
+                    setStatus(`${decodedText} \u4e4b\u524d\u5df2\u7d93\u767b\u9304\u904e`, false);
+                    pauseMs = 1000;
+                } else {
+                    setStatus(`\u53c3\u52a0\u8005${decodedText} \u767b\u9304\u6210\u529f`, true);
+                    pauseMs = 3000;
+                }
+            } catch (e) {
+                setStatus('Server error', false);
             }
         } else {
             setStatus('Invalid participant ID', false);

@@ -20,9 +20,11 @@
     <script>
     const TOTAL_STORES = 56;
 
-    function getCheckins(id) {
-        const checkins = JSON.parse(localStorage.getItem('checkins') || '{}');
-        return checkins[id] || new Array(TOTAL_STORES).fill(false);
+    async function getCheckins(id) {
+        const res = await fetch(`/participant/${encodeURIComponent(id)}`);
+        if (!res.ok) throw new Error('Server error');
+        const data = await res.json();
+        return data.visits || new Array(TOTAL_STORES).fill(false);
     }
 
     function setInfo(msg) {
@@ -34,12 +36,17 @@
             stores.length ? `\u5df2\u8a2a\u554f\u5e97\u5bb6\uff1a${stores.join(', ')}` : '';
     }
 
-    function onScanSuccess(decodedText) {
-        const visits = getCheckins(decodedText);
-        const count = visits.filter(v => v).length;
-        setInfo(`Visited ${count} store(s)`);
-        const stores = visits.map((v, i) => v ? i + 1 : null).filter(v => v);
-        setList(stores);
+    async function onScanSuccess(decodedText) {
+        try {
+            const visits = await getCheckins(decodedText);
+            const count = visits.filter(v => v).length;
+            setInfo(`Visited ${count} store(s)`);
+            const stores = visits.map((v, i) => v ? i + 1 : null).filter(v => v);
+            setList(stores);
+        } catch (e) {
+            setInfo('Server error');
+            setList([]);
+        }
     }
 
     const html5QrCode = new Html5Qrcode('qr-reader');
