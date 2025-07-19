@@ -16,9 +16,11 @@
     <div id="info"></div>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
+    const TOTAL_STORES = 56;
+
     function getCheckins(id) {
         const checkins = JSON.parse(localStorage.getItem('checkins') || '{}');
-        return checkins[id] || [];
+        return checkins[id] || new Array(TOTAL_STORES).fill(false);
     }
 
     function setInfo(msg) {
@@ -27,7 +29,8 @@
 
     function onScanSuccess(decodedText) {
         const visits = getCheckins(decodedText);
-        setInfo(`Visited ${visits.length} store(s)`);
+        const count = visits.filter(v => v).length;
+        setInfo(`Visited ${count} store(s)`);
     }
 
     const html5QrCode = new Html5Qrcode('qr-reader');

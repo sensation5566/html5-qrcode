@@ -7,7 +7,11 @@ It shows two pages:
 - **participant.html** – for participants to scan their own QR code and see how many stores they have visited.
 
 Serve the HTML files with a local web server (for example `npx http-server`) and visit
-`/examples/event-registration/store.html` or `/examples/event-registration/participant.html`.
+`/examples/event-registration/store.html?num=1` for the first store (replace the
+number to select a store) or `/examples/event-registration/participant.html`.
+
+There are 56 stores in total. Check-ins are stored in `localStorage` as a matrix
+of participants by store number so each visit is tracked separately.
 
 Both pages include **html5-qrcode** from the CDN:
 

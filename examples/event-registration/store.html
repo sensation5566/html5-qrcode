@@ -11,19 +11,25 @@
     </style>
 </head>
 <body>
-    <h1>Store Check-in</h1>
+    <h1>Store <span id="store-num"></span> Check-in</h1>
     <div id="qr-reader"></div>
     <div id="status"></div>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-    const STORE_NAME = 'Store-A';
+    const TOTAL_STORES = 56;
+    const params = new URLSearchParams(location.search);
+    const storeNum = parseInt(params.get('num') || '1', 10);
+    document.getElementById('store-num').textContent = storeNum;
+
     const PARTICIPANTS = ['P001','P002','P003'];
 
     function updateCheckin(id) {
         let checkins = JSON.parse(localStorage.getItem('checkins') || '{}');
-        if (!checkins[id]) checkins[id] = [];
-        if (!checkins[id].includes(STORE_NAME)) {
-            checkins[id].push(STORE_NAME);
+        if (!checkins[id]) {
+            checkins[id] = new Array(TOTAL_STORES).fill(false);
+        }
+        if (!checkins[id][storeNum - 1]) {
+            checkins[id][storeNum - 1] = true;
             localStorage.setItem('checkins', JSON.stringify(checkins));
         }
     }
