@@ -28,10 +28,12 @@
         if (!checkins[id]) {
             checkins[id] = new Array(TOTAL_STORES).fill(false);
         }
-        if (!checkins[id][storeNum - 1]) {
+        const already = checkins[id][storeNum - 1];
+        if (!already) {
             checkins[id][storeNum - 1] = true;
             localStorage.setItem('checkins', JSON.stringify(checkins));
         }
+        return already;
     }
 
     function setStatus(msg, ok) {
@@ -42,9 +44,12 @@
 
     function onScanSuccess(decodedText) {
         if (PARTICIPANTS.includes(decodedText)) {
-            updateCheckin(decodedText);
-            setStatus(`Participant ${decodedText} registered`, true);
-            alert(`Participant ${decodedText} \u5df2\u767b\u5165`);
+            const already = updateCheckin(decodedText);
+            if (already) {
+                setStatus(`${decodedText} \u4e4b\u524d\u5df2\u7d93\u767b\u9304\u904e`, false);
+            } else {
+                setStatus(`Participant ${decodedText} registered`, true);
+            }
         } else {
             setStatus('Invalid participant ID', false);
         }
