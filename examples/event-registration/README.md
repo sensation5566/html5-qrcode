@@ -16,3 +16,5 @@ Both pages include **html5-qrcode** from the CDN:
 ```
 
 The demo uses `localStorage` to keep check-in information so it works without a backend server.
+
+Both pages start the scanner with `{ facingMode: { exact: "environment" } }` so that the back camera is used when available.
