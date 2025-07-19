@@ -17,7 +17,8 @@ Both pages include **html5-qrcode** from the CDN:
 
 The demo uses `localStorage` to keep check-in information so it works without a backend server.
 
-Both pages start the scanner with `{ facingMode: { exact: "environment" } }` so that the back camera is used when available.
+Both pages start the scanner with `{ facingMode: "environment" }` so the back camera is preferred.
+If it isn't available, they fall back to the default camera automatically.
 
 File uploads are disabled—scanning works only through the camera. If you use
 `Html5QrcodeScanner`, pass `supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]`

@@ -45,12 +45,14 @@
     }
 
     const html5QrCode = new Html5Qrcode('qr-reader');
-    html5QrCode.start(
-        { facingMode: { exact: 'environment' } },
-        { fps: 10, qrbox: 250 },
-        onScanSuccess,
-        (err) => console.error(err)
-    );
+    const config = { fps: 10, qrbox: 250 };
+
+    html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
+      .catch(err => {
+        console.warn('Falling back to default camera', err);
+        html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess)
+          .catch(err2 => console.error(err2));
+      });
     </script>
 </body>
 </html>
