@@ -5,8 +5,33 @@ const url = require('url');
 
 const PORT = process.env.PORT || 8088;
 const TOTAL_STORES = 56;
+const DATA_FILE = path.join(__dirname, 'checkins.log');
 
 let checkins = {};
+
+function loadData() {
+  if (!fs.existsSync(DATA_FILE)) return;
+  const lines = fs.readFileSync(DATA_FILE, 'utf8').split('\n');
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    try {
+      const { id, store } = JSON.parse(line);
+      if (typeof id !== 'string' || typeof store !== 'number') continue;
+      if (!checkins[id]) {
+        checkins[id] = new Array(TOTAL_STORES).fill(false);
+      }
+      checkins[id][store - 1] = true;
+    } catch (e) {
+      console.warn('Ignored bad line in log:', line);
+    }
+  }
+}
+
+function appendEvent(id, store) {
+  fs.appendFile(DATA_FILE, JSON.stringify({ id, store }) + '\n', err => {
+    if (err) console.error('Failed to persist check-in', err);
+  });
+}
 
 function send(res, status, data, contentType = 'application/json') {
   res.writeHead(status, {
@@ -34,6 +59,7 @@ function handleApi(req, res, parsed) {
         const already = checkins[id][store - 1];
         if (!already) {
           checkins[id][store - 1] = true;
+          appendEvent(id, store);
         }
         send(res, 200, { already, visits: checkins[id] });
       } catch (e) {
@@ -84,6 +110,8 @@ function serveStatic(res, pathname) {
     send(res, 200, data, type);
   });
 }
+
+loadData();
 
 const server = http.createServer((req, res) => {
   if (req.method === 'OPTIONS') {
