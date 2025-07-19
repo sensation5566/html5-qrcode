@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8088;
 const TOTAL_STORES = 56;
 
 let checkins = {};

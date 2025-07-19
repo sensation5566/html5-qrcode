@@ -9,8 +9,8 @@ It shows three pages and a small server:
 - **server.js** – serves the pages and stores check-ins in memory so all devices share the same data.
 
 Run `node server.js` in this folder and open
-`http://localhost:8080/store.html?num=1` for the first store (replace the
-number to select a store) or `http://localhost:8080/participant.html`.
+`http://localhost:8088/store.html?num=1` for the first store (replace the
+number to select a store) or `http://localhost:8088/participant.html`.
 Opening the pages with the `file://` protocol won't work because the scanner
 cannot load the library.
 
