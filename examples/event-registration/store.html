@@ -21,6 +21,7 @@
     const storeNum = parseInt(params.get('num') || '1', 10);
     document.getElementById('store-num').textContent = storeNum;
 
+    // Update this list with the participant IDs encoded in your QR codes
     const PARTICIPANTS = ['P001','P002','P003'];
 
     function updateCheckin(id) {

@@ -10,6 +10,8 @@ It shows three pages:
 Serve the HTML files with a local web server (for example `npx http-server`) and visit
 `/examples/event-registration/store.html?num=1` for the first store (replace the
 number to select a store) or `/examples/event-registration/participant.html`.
+Opening the pages directly using the `file://` protocol gives each file its own
+`localStorage`, so all totals appear as `0`.
 
 There are 56 stores in total. Check-ins are stored in `localStorage` as a matrix
 of participants by store number so each visit is tracked separately.
@@ -20,7 +22,7 @@ All pages include **html5-qrcode** from the CDN:
 <script src="https://unpkg.com/html5-qrcode"></script>
 ```
 
-The demo uses `localStorage` to keep check-in information so it works without a backend server.
+The demo uses `localStorage` to keep check-in information so it works without a backend server. Make sure the `PARTICIPANTS` array in `store.html` lists the IDs encoded in your QR codes.
 
 All pages start the scanner with `{ facingMode: "environment" }` so the back camera is preferred.
 If it isn't available, they fall back to the default camera automatically.
