@@ -2,12 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Participant Check-ins</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 1em; text-align: center; }
+        #qr-reader { width: 100%; max-width: 400px; margin: 0 auto; }
+        #info { margin-top: 20px; font-weight: bold; }
+    </style>
 </head>
 <body>
     <h1>Participant Portal</h1>
-    <div id="qr-reader" style="width:500px"></div>
-    <div id="info" style="margin-top:20px;font-weight:bold;"></div>
+    <div id="qr-reader"></div>
+    <div id="info"></div>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
     function getCheckins(id) {
