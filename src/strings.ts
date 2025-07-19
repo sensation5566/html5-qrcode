@@ -128,7 +128,8 @@ export class Html5QrcodeScannerStrings {
      * This will be used to switch to file based scanning.
      */
     public static textIfCameraScanSelected(): string {
-        return "Scan an Image File";
+        // Removed as the app now only supports camera scanning
+        return "";
     }
 
     /**
