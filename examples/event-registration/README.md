@@ -3,7 +3,7 @@
 This example demonstrates how to use **html5-qrcode** for a simple event check-in system.
 It shows two pages:
 
-- **store.html** – for store owners to scan a participant's QR code and record a visit. If the participant has already checked in at that store, the page shows a red warning message.
+- **store.html** – for store owners to scan a participant's QR code and record a visit. If the participant has already checked in at that store, the page shows a red warning message. The scanner pauses for five seconds after each scan so the message stays visible.
 - **participant.html** – for participants to scan their own QR code, see how many stores they have visited, and list the store numbers.
 
 Serve the HTML files with a local web server (for example `npx http-server`) and visit

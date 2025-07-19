@@ -42,7 +42,14 @@
         el.textContent = msg;
     }
 
+    function clearStatus() {
+        document.getElementById('status').textContent = '';
+    }
+
+    let resumeTimeout = null;
     function onScanSuccess(decodedText) {
+        if (resumeTimeout) return;
+        html5QrCode.pause(true);
         if (PARTICIPANTS.includes(decodedText)) {
             const already = updateCheckin(decodedText);
             if (already) {
@@ -53,6 +60,11 @@
         } else {
             setStatus('Invalid participant ID', false);
         }
+        resumeTimeout = setTimeout(() => {
+            clearStatus();
+            html5QrCode.resume();
+            resumeTimeout = null;
+        }, 5000);
     }
 
     const html5QrCode = new Html5Qrcode('qr-reader');
