@@ -5,15 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Store Check-in</title>
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 1em; text-align: center; }
-        #qr-reader { width: 100%; max-width: 400px; margin: 0 auto; }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('img/bg.png') no-repeat center center / cover;
+        }
+        #main-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 1em;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        #camera-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1127 / 1200;
+            background: url('img/camera.png') no-repeat center center;
+            background-size: contain;
+            margin: 0 auto;
+        }
+        #qr-reader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 40%;
+        }
         #status { margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>Store <span id="store-num"></span> Check-in</h1>
-    <div id="qr-reader"></div>
-    <div id="status"></div>
+    <div id="main-container">
+        <h1>Store <span id="store-num"></span> Check-in</h1>
+        <div id="camera-wrapper">
+            <div id="qr-reader"></div>
+        </div>
+        <div id="status"></div>
+    </div>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
     const TOTAL_STORES = 56;
