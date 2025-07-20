@@ -109,8 +109,18 @@
         }, pauseMs);
     }
 
+    const qrboxFunction = function(viewfinderWidth, viewfinderHeight) {
+        let minEdgePercentage = 0.7; // 70%
+        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+        let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+        return {
+            width: qrboxSize,
+            height: qrboxSize
+        };
+    };
+
     const html5QrCode = new Html5Qrcode('qr-reader');
-    const config = { fps: 10, qrbox: 200, aspectRatio: 1.0 };
+    const config = { fps: 10, qrbox: qrboxFunction, aspectRatio: 1.0 };
 
     html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
       .catch(err => {
