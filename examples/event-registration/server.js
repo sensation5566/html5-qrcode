@@ -28,8 +28,9 @@ function loadData() {
 }
 
 function appendEvent(id, store) {
-  const now = new Date();
-  const time = now.toISOString().replace('T', ' ').substring(0, 19).replace(/-/g, '/');
+  const time = new Date()
+    .toLocaleString('sv-SE', { timeZone: 'Asia/Taipei' })
+    .replace(/-/g, '/');
   fs.appendFile(
     DATA_FILE,
     JSON.stringify({ id, store, time }) + '\n',
