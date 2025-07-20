@@ -65,6 +65,8 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            max-width: 80vw;
+            margin: 0 auto;
         }
         #status {
             margin-top: 20px;
@@ -95,13 +97,15 @@
     function adjustStoreNameFont() {
         let size = 2.0;
         storeNameEl.style.fontSize = size + 'em';
-        const maxWidth = storeNameEl.parentElement.clientWidth;
-        while (storeNameEl.scrollWidth > maxWidth && size > 1.0) {
+        const maxWidth = Math.min(storeNameEl.parentElement.clientWidth,
+                                  window.innerWidth * 0.8);
+        while (storeNameEl.scrollWidth > maxWidth && size > 0.5) {
             size -= 0.1;
             storeNameEl.style.fontSize = size.toFixed(1) + 'em';
         }
     }
     adjustStoreNameFont();
+    window.addEventListener('resize', adjustStoreNameFont);
 
     // Update this list with the participant IDs encoded in your QR codes
     const PARTICIPANTS = ['P001','P002','P003'];
