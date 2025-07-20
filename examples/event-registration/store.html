@@ -26,14 +26,12 @@
         }
         #camera-wrapper {
             position: relative;
-            width: 100%;
-            aspect-ratio: 1127 / 1200;
+            width: 80%;
             background: url('img/camera.png') no-repeat center center;
             background-size: contain;
             margin: 0 auto;
         }
         #qr-reader {
-            position: absolute;
             top: 55%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -112,7 +110,7 @@
     }
 
     const html5QrCode = new Html5Qrcode('qr-reader');
-    const config = { fps: 10, qrbox: 200 };
+    const config = { fps: 10, qrbox: 200, aspectRatio: 1.0 };
 
     html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
       .catch(err => {
