@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Store Login</title>
+    <style>
+        html, body { width:100%; height:100%; margin:0; padding:0; }
+        body {
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background-color:#333;
+            background-image:url('img/bg.png');
+            background-repeat:no-repeat;
+            background-position:top center;
+            background-size:auto 100%;
+            font-family:sans-serif;
+        }
+        #main {
+            width:100%;
+            max-width:400px;
+            text-align:center;
+        }
+        #img-wrapper {
+            position:relative;
+            width:80%;
+            margin:0 auto;
+        }
+        #img-wrapper img { width:100%; display:block; }
+        #store-input {
+            position:absolute;
+            left:10%;
+            top:35%;
+            width:50%;
+            background:transparent;
+            border:none;
+            font-size:1.5em;
+            text-align:center;
+            color:#fff;
+            outline:none;
+        }
+        #submit-area {
+            position:absolute;
+            top:0;
+            right:0;
+            width:25%;
+            height:100%;
+            cursor:pointer;
+        }
+        #invalid img { width:80%; }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div id="img-wrapper">
+            <img src="img/store_id.png" alt="Store ID">
+            <input id="store-input" type="text" inputmode="numeric" pattern="\\d*" maxlength="6" />
+            <div id="submit-area"></div>
+        </div>
+        <div id="invalid"></div>
+    </div>
+    <script>
+    async function loadStores() {
+        const res = await fetch('store_table.txt');
+        const text = await res.text();
+        const obj = Function('return ' + text)();
+        return Object.values(obj);
+    }
+
+    function showInvalid() {
+        document.getElementById('invalid').innerHTML = '<img src="img/store_invalid.png">';
+    }
+
+    loadStores().then(stores => {
+        document.getElementById('submit-area').addEventListener('click', () => {
+            const val = document.getElementById('store-input').value.trim();
+            if (stores.includes(val)) {
+                sessionStorage.setItem('storeNum', val);
+                location.href = 'store.html';
+            } else {
+                showInvalid();
+            }
+        });
+    });
+    </script>
+</body>
+</html>

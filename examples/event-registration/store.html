@@ -60,8 +60,10 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
     const TOTAL_STORES = 56;
-    const params = new URLSearchParams(location.search);
-    const storeNum = parseInt(params.get('num') || '1', 10);
+    const storeNum = parseInt(sessionStorage.getItem('storeNum') || '0', 10);
+    if (!storeNum) {
+        location.href = 'store-login.html';
+    }
     document.getElementById('store-num').textContent = storeNum;
 
     // Update this list with the participant IDs encoded in your QR codes
