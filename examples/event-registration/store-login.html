@@ -24,10 +24,13 @@
         }
         #img-wrapper {
             position:relative;
+            text-align:center;
+        }
+        #img-wrapper img {
             width:80%;
+            display:block;
             margin:0 auto;
         }
-        #img-wrapper img { width:100%; display:block; }
         #store-input {
             position:absolute;
             left:10%;
@@ -37,7 +40,7 @@
             border:none;
             font-size:1.5em;
             text-align:center;
-            color:#fff;
+            color:#000;
             outline:none;
         }
         #submit-area {
@@ -48,7 +51,12 @@
             height:100%;
             cursor:pointer;
         }
-        #invalid img { width:80%; }
+        #invalid {
+            min-height:100px;
+        }
+        #invalid img {
+            width:60%;
+        }
     </style>
 </head>
 <body>
@@ -65,18 +73,19 @@
         const res = await fetch('store_table.txt');
         const text = await res.text();
         const obj = Function('return ' + text)();
-        return Object.values(obj);
+        return obj;
     }
 
     function showInvalid() {
         document.getElementById('invalid').innerHTML = '<img src="img/store_invalid.png">';
     }
 
-    loadStores().then(stores => {
+    loadStores().then(table => {
         document.getElementById('submit-area').addEventListener('click', () => {
             const val = document.getElementById('store-input').value.trim();
-            if (stores.includes(val)) {
-                sessionStorage.setItem('storeNum', val);
+            const key = Object.keys(table).find(k => table[k] === val);
+            if (key) {
+                sessionStorage.setItem('storeNum', key);
                 location.href = 'store.html';
             } else {
                 showInvalid();
