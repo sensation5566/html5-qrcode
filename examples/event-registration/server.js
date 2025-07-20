@@ -28,9 +28,15 @@ function loadData() {
 }
 
 function appendEvent(id, store) {
-  fs.appendFile(DATA_FILE, JSON.stringify({ id, store }) + '\n', err => {
-    if (err) console.error('Failed to persist check-in', err);
-  });
+  const now = new Date();
+  const time = now.toISOString().replace('T', ' ').substring(0, 19).replace(/-/g, '/');
+  fs.appendFile(
+    DATA_FILE,
+    JSON.stringify({ id, store, time }) + '\n',
+    err => {
+      if (err) console.error('Failed to persist check-in', err);
+    }
+  );
 }
 
 function send(res, status, data, contentType = 'application/json') {
