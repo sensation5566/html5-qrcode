@@ -91,6 +91,16 @@ function handleApi(req, res, parsed) {
     return true;
   }
 
+  if (req.method === 'GET' && parsed.pathname === '/clear-localstorage') {
+    const html = `<!DOCTYPE html><html><body><script>
+      localStorage.clear();
+      sessionStorage.clear();
+      document.body.textContent = 'Local storage cleared';
+    </script></body></html>`;
+    send(res, 200, html, 'text/html');
+    return true;
+  }
+
   return false;
 }
 
