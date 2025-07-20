@@ -28,16 +28,27 @@
             position: relative;
             width: 80%;
             background: url('img/camera.png') no-repeat center center;
-            margin: 0 auto; 
-            background-size: 76% 100%;
             margin: 0 auto;
-            padding-top: 12%;
+            background-size: 76% 97%;
+            margin: 0 auto;
+            padding-top: 10%;
             padding-right: 3%;
-            padding-bottom: 2%;
+            padding-bottom: 3%;
         }
         #qr-reader {
             width: 70%;
             margin: auto;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+        }
+        #qr-reader video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
         }
         h1 {
             color: #ffffff;
@@ -141,7 +152,7 @@
     };
 
     const html5QrCode = new Html5Qrcode('qr-reader');
-    const config = { fps: 10, qrbox: qrboxFunction, aspectRatio: 0.75 };
+    const config = { fps: 10, qrbox: qrboxFunction, aspectRatio: 1.0 };
 
     html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
       .catch(err => {
