@@ -62,7 +62,7 @@
 </head>
 <body>
     <div id="main-container">
-        <h1 style="padding-top: 3.5em;">Store <span id="store-num"></span></h1>
+        <h1 style="padding-top: 3.5em;"><span id="store-name"></span></h1>
         <div id="camera-wrapper">
             <div id="qr-reader"></div>
         </div>
@@ -70,12 +70,13 @@
     </div>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-    const TOTAL_STORES = 56;
-    const storeNum = parseInt(sessionStorage.getItem('storeNum') || '0', 10);
-    if (!storeNum) {
+    const TOTAL_STORES = 47;
+    const storeIndex = parseInt(sessionStorage.getItem('storeIndex') || '0', 10);
+    const storeName = sessionStorage.getItem('storeName') || '';
+    if (!storeIndex || !storeName) {
         location.href = 'store-login.html';
     }
-    document.getElementById('store-num').textContent = storeNum;
+    document.getElementById('store-name').textContent = storeName;
 
     // Update this list with the participant IDs encoded in your QR codes
     const PARTICIPANTS = ['P001','P002','P003'];
@@ -84,7 +85,7 @@
         const res = await fetch('/checkin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, store: storeNum })
+            body: JSON.stringify({ id, store: storeIndex })
         });
         if (!res.ok) throw new Error('Server error');
         const data = await res.json();

@@ -4,7 +4,7 @@ const path = require('path');
 const url = require('url');
 
 const PORT = process.env.PORT || 8088;
-const TOTAL_STORES = 56;
+const TOTAL_STORES = 47;
 const DATA_FILE = path.join(__dirname, 'checkins.log');
 
 let checkins = {};

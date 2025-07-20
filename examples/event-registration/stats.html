@@ -20,22 +20,30 @@
         <tbody></tbody>
     </table>
     <script>
-    const TOTAL_STORES = 56;
-
     async function loadTotals() {
         const res = await fetch('/stats');
         if (!res.ok) throw new Error('Server error');
         return res.json();
     }
 
+    async function loadStoreNames() {
+        const res = await fetch('store_table.txt');
+        const text = await res.text();
+        const obj = Function('return ' + text)();
+        return Object.keys(obj);
+    }
+
     async function populateTable() {
         const tbody = document.querySelector('#summary-table tbody');
-        const {totals, lists} = await loadTotals();
+        const [names, { totals, lists }] = await Promise.all([
+            loadStoreNames(),
+            loadTotals()
+        ]);
         tbody.innerHTML = '';
-        for (let i = 0; i < TOTAL_STORES; i++) {
+        for (let i = 0; i < names.length; i++) {
             const tr = document.createElement('tr');
             const storeCell = document.createElement('td');
-            storeCell.textContent = `Store ${i + 1}`;
+            storeCell.textContent = names[i];
             const countCell = document.createElement('td');
             countCell.textContent = totals[i];
             const listCell = document.createElement('td');
