@@ -28,19 +28,27 @@
             position: relative;
             width: 80%;
             background: url('img/camera.png') no-repeat center center;
-            background-size: contain;
+            margin: 0 auto; 
+            background-size: 76% 100%;
             margin: 0 auto;
+            padding-top: 12%;
+            padding-right: 3%;
+            padding-bottom: 2%;
         }
         #qr-reader {
             width: 70%;
             margin: auto;
+        }
+        h1 {
+            color: #ffffff;
         }
         #status { margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div id="main-container">
-        <h1>Store <span id="store-num"></span> Check-in</h1>
+        <p></p>
+        <h1>Store <span id="store-num"></span></h1>
         <div id="camera-wrapper">
             <div id="qr-reader"></div>
         </div>
@@ -67,14 +75,24 @@
         return data.already;
     }
 
-    function setStatus(msg, ok) {
+    function setStatus(type) {
         const el = document.getElementById('status');
-        el.style.color = ok ? 'green' : 'red';
-        el.textContent = msg;
+        let src = null;
+        if (type === 'ok') src = 'img/code_ok.png';
+        else if (type === 'already') src = 'img/code_already.png';
+        else if (type === 'invalid') src = 'img/code_invalid.png';
+        if (src) {
+            el.innerHTML = `<img src="${src}" style="width:80%">`;
+        } else {
+            el.style.color = 'red';
+            el.textContent = type;
+        }
     }
 
     function clearStatus() {
-        document.getElementById('status').textContent = '';
+        const el = document.getElementById('status');
+        el.textContent = '';
+        el.innerHTML = '';
     }
 
     let resumeTimeout = null;
@@ -87,17 +105,17 @@
             try {
                 const already = await updateCheckin(decodedText);
                 if (already) {
-                    setStatus(`${decodedText} \u4e4b\u524d\u5df2\u7d93\u767b\u9304\u904e`, false);
+                    setStatus('already');
                     pauseMs = 1000;
                 } else {
-                    setStatus(`\u53c3\u52a0\u8005${decodedText} \u767b\u9304\u6210\u529f`, true);
+                    setStatus('ok');
                     pauseMs = 3000;
                 }
             } catch (e) {
-                setStatus('Server error', false);
+                setStatus('Server error');
             }
         } else {
-            setStatus('Invalid participant ID', false);
+            setStatus('invalid');
             pauseMs = 1000;
         }
         resumeTimeout = setTimeout(() => {
