@@ -86,6 +86,7 @@
     <script>
     const TOTAL_STORES = 47;
     let STORE_NAMES = [];
+    const PARTICIPANTS = ['P001','P002','P003'];
 
     async function loadStoreNames() {
         const res = await fetch('store_table.txt');
@@ -110,7 +111,15 @@
         listEl.innerHTML = names.join('<br>');
     }
 
+    let resumeTimeout = null;
     async function onScanSuccess(decodedText) {
+        if (resumeTimeout) return;
+        if (!PARTICIPANTS.includes(decodedText)) {
+            setInfo('Invalid');
+            setList([]);
+            return;
+        }
+        html5QrCode.pause(true);
         try {
             const visits = await getCheckins(decodedText);
             const count = visits.filter(v => v).length;
@@ -121,10 +130,21 @@
             setInfo('Server error');
             setList([]);
         }
+        resumeTimeout = setTimeout(() => {
+            html5QrCode.resume();
+            resumeTimeout = null;
+        }, 3000);
     }
 
+    const qrboxFunction = function(viewfinderWidth, viewfinderHeight) {
+        let minEdgePercentage = 0.7; // 70%
+        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+        let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+        return { width: qrboxSize, height: qrboxSize };
+    };
+
     const html5QrCode = new Html5Qrcode('qr-reader');
-    const config = { fps: 10, qrbox: 200, aspectRatio: 1.0 };
+    const config = { fps: 10, qrbox: qrboxFunction, aspectRatio: 1.0 };
 
     loadStoreNames().then(() => {
         html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
