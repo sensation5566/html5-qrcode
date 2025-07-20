@@ -15,7 +15,7 @@
     <h1>Check-in Summary</h1>
     <table id="summary-table">
         <thead>
-            <tr><th>Store</th><th>Check-ins</th><th>Participants</th></tr>
+            <tr><th>#</th><th>Store</th><th>Check-ins</th><th>Participants</th></tr>
         </thead>
         <tbody></tbody>
     </table>
@@ -42,12 +42,15 @@
         tbody.innerHTML = '';
         for (let i = 0; i < names.length; i++) {
             const tr = document.createElement('tr');
+            const numCell = document.createElement('td');
+            numCell.textContent = i + 1;
             const storeCell = document.createElement('td');
             storeCell.textContent = names[i];
             const countCell = document.createElement('td');
             countCell.textContent = totals[i];
             const listCell = document.createElement('td');
             listCell.textContent = lists[i].join(', ');
+            tr.appendChild(numCell);
             tr.appendChild(storeCell);
             tr.appendChild(countCell);
             tr.appendChild(listCell);
