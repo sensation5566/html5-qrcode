@@ -1,6 +1,6 @@
 {
     '1496 Bar': 'x7yagn',
-    '十二燒': 'zmm628',
+    '十二燒': 'zmm814',
     '文明放縱鹽酥雞酒吧': 'dbo5x4',
     '台日交流Cafe & Bar Kiseki': 'x2c2mv',
     '四葉草 CLOVER': 'u8jw2e',
