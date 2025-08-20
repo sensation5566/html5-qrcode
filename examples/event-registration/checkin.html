@@ -90,7 +90,7 @@
 
     async function hasCheckedIn(id) {
         try {
-            const res = await fetch('/checkin.log');
+            const res = await fetch('/checkin.log', { cache: 'no-store' });
             if (!res.ok) return false;
             const text = await res.text();
             return text.split('\n').some(line => line.trim() === id);
