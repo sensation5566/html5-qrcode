@@ -88,11 +88,23 @@
         if (!res.ok) throw new Error('Server error');
     }
 
+    async function hasCheckedIn(id) {
+        try {
+            const res = await fetch('/checkin.log');
+            if (!res.ok) return false;
+            const text = await res.text();
+            return text.split('\n').some(line => line.trim() === id);
+        } catch (e) {
+            return false;
+        }
+    }
+
     function setStatus(type) {
         const el = document.getElementById('status');
         let src = null;
         if (type === 'ok') src = 'img/finish_checkin.png';
         else if (type === 'invalid') src = 'img/code_invalid.png';
+        else if (type === 'already') src = 'img/already_checkin.png';
         if (src) {
             el.innerHTML = `<img src="${src}" style="width:80%">`;
         } else {
@@ -115,9 +127,14 @@
         let pauseMs = 1000;
         if (PARTICIPANTS.includes(decodedText)) {
             try {
-                await logCheckin(decodedText);
-                setStatus('ok');
-                pauseMs = 3000;
+                if (await hasCheckedIn(decodedText)) {
+                    setStatus('already');
+                    pauseMs = 3000;
+                } else {
+                    await logCheckin(decodedText);
+                    setStatus('ok');
+                    pauseMs = 3000;
+                }
             } catch (e) {
                 setStatus('Server error');
             }
