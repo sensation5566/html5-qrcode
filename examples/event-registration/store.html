@@ -86,8 +86,8 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
     const TOTAL_STORES = 47;
-    const storeIndex = parseInt(sessionStorage.getItem('storeIndex') || '0', 10);
-    const storeName = sessionStorage.getItem('storeName') || '';
+    const storeIndex = parseInt(localStorage.getItem('storeIndex') || '0', 10);
+    const storeName = localStorage.getItem('storeName') || '';
     if (!storeIndex || !storeName) {
         location.href = 'store-login.html';
     }

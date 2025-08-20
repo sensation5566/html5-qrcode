@@ -95,8 +95,8 @@
             const idx = names.findIndex(k => table[k] === val);
             if (idx >= 0) {
                 const name = names[idx];
-                sessionStorage.setItem('storeIndex', String(idx + 1));
-                sessionStorage.setItem('storeName', name);
+                localStorage.setItem('storeIndex', String(idx + 1));
+                localStorage.setItem('storeName', name);
                 location.href = 'store.html';
             } else {
                 showInvalid();
