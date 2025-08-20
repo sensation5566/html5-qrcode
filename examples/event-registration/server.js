@@ -5,9 +5,11 @@ const url = require('url');
 
 const PORT = process.env.PORT || 8088;
 const TOTAL_STORES = 47;
-const DATA_FILE = path.join(__dirname, 'checkins.log');
+const DATA_FILE = path.join(__dirname, 'store_checkins.log');
+const CHECKIN_FILE = path.join(__dirname, 'checkin.log');
 
 let checkins = {};
+let registered = new Set();
 
 function loadData() {
   if (!fs.existsSync(DATA_FILE)) return;
@@ -27,6 +29,15 @@ function loadData() {
   }
 }
 
+function loadRegistered() {
+  if (!fs.existsSync(CHECKIN_FILE)) return;
+  const lines = fs.readFileSync(CHECKIN_FILE, 'utf8').split('\n');
+  for (const line of lines) {
+    const id = line.trim();
+    if (id) registered.add(id);
+  }
+}
+
 function appendEvent(id, store) {
   const time = new Date()
     .toLocaleString('sv-SE', { timeZone: 'Asia/Taipei' })
@@ -40,6 +51,12 @@ function appendEvent(id, store) {
   );
 }
 
+function appendRegistered(id) {
+  fs.appendFile(CHECKIN_FILE, id + '\n', err => {
+    if (err) console.error('Failed to persist check-in', err);
+  });
+}
+
 function send(res, status, data, contentType = 'application/json') {
   res.writeHead(status, {
     'Content-Type': contentType,
@@ -50,6 +67,28 @@ function send(res, status, data, contentType = 'application/json') {
 }
 
 function handleApi(req, res, parsed) {
+  if (req.method === 'POST' && parsed.pathname === '/participant-checkin') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { id } = JSON.parse(body || '{}');
+        if (typeof id !== 'string') {
+          send(res, 400, { error: 'invalid request' });
+          return;
+        }
+        if (!registered.has(id)) {
+          registered.add(id);
+          appendRegistered(id);
+        }
+        send(res, 200, { ok: true });
+      } catch (e) {
+        send(res, 400, { error: 'invalid json' });
+      }
+    });
+    return true;
+  }
+
   if (req.method === 'POST' && parsed.pathname === '/checkin') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -58,6 +97,10 @@ function handleApi(req, res, parsed) {
         const { id, store } = JSON.parse(body || '{}');
         if (typeof id !== 'string' || typeof store !== 'number') {
           send(res, 400, { error: 'invalid request' });
+          return;
+        }
+        if (!registered.has(id)) {
+          send(res, 200, { notCheckin: true });
           return;
         }
         if (!checkins[id]) {
@@ -129,6 +172,7 @@ function serveStatic(res, pathname) {
 }
 
 loadData();
+loadRegistered();
 
 const server = http.createServer((req, res) => {
   if (req.method === 'OPTIONS') {
