@@ -66,8 +66,10 @@
         }
         #list {
             margin-top:10px;
-            max-height:6em;
+            height:12em;
+            max-height:12em;
             overflow-y:auto;
+            visibility:hidden;
         }
         #prompt {
             margin-bottom:10px;
@@ -127,7 +129,9 @@
     }
 
     function setList(names) {
-        document.getElementById('list').innerHTML = names.join('<br>');
+        const list = document.getElementById('list');
+        list.innerHTML = names.join('<br>');
+        list.style.visibility = names.length ? 'visible' : 'hidden';
     }
 
     Promise.all([loadStoreNames(), loadParticipants()]).then(() => {
