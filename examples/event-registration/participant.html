@@ -69,10 +69,15 @@
             max-height:6em;
             overflow-y:auto;
         }
+        #prompt {
+            margin-bottom:10px;
+            font-weight:bold;
+        }
     </style>
 </head>
 <body>
     <div id="main">
+        <div id="prompt">請輸入您的ID</div>
         <div id="img-wrapper">
             <img src="img/store_id.png" alt="Participant ID">
             <input id="participant-input" type="text" pattern="[A-Za-z0-9]*" maxlength="20" />
@@ -141,7 +146,7 @@
             try {
                 const visits = await getCheckins(val);
                 const names = STORE_NAMES.filter((_, i) => visits[i]);
-                setInfo(`Visited ${names.length} store(s)`);
+                setInfo(`已於 ${names.length} 間店兌換：`);
                 setList(names);
             } catch (e) {
                 setInfo('Server error');
