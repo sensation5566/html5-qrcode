@@ -86,7 +86,13 @@
     <script>
     const TOTAL_STORES = 47;
     let STORE_NAMES = [];
-    const PARTICIPANTS = ['P001','P002','P003'];
+    let PARTICIPANTS = [];
+
+    async function loadParticipants() {
+        const res = await fetch('participants.txt');
+        const text = await res.text();
+        PARTICIPANTS = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+    }
 
     async function loadStoreNames() {
         const res = await fetch('store_table.txt');
@@ -146,7 +152,7 @@
     const html5QrCode = new Html5Qrcode('qr-reader');
     const config = { fps: 10, qrbox: qrboxFunction, aspectRatio: 1.0 };
 
-    loadStoreNames().then(() => {
+    Promise.all([loadStoreNames(), loadParticipants()]).then(() => {
         html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
           .catch(err => {
             console.warn('Falling back to default camera', err);

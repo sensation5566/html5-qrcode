@@ -24,7 +24,8 @@ All pages include **html5-qrcode** from the CDN:
 <script src="https://unpkg.com/html5-qrcode"></script>
 ```
 
-Make sure the `PARTICIPANTS` array in `store.html` lists the IDs encoded in your QR codes.
+Update `participants.txt` with the IDs encoded in your QR codes; all pages load
+the participant list from this file.
 
 All pages start the scanner with `{ facingMode: "environment" }` so the back camera is preferred.
 If it isn't available, they fall back to the default camera automatically.

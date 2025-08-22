@@ -77,7 +77,12 @@
     </div>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-    const PARTICIPANTS = ['P001','P002','P003'];
+    let PARTICIPANTS = [];
+    async function loadParticipants() {
+        const res = await fetch('participants.txt');
+        const text = await res.text();
+        PARTICIPANTS = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+    }
 
     async function logCheckin(id) {
         const res = await fetch('/participant-checkin', {
@@ -162,12 +167,14 @@
     const html5QrCode = new Html5Qrcode('qr-reader');
     const config = { fps: 10, qrbox: qrboxFunction, aspectRatio: 1.0 };
 
-    html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
-      .catch(err => {
-        console.warn('Falling back to default camera', err);
-        html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess)
-          .catch(err2 => console.error(err2));
-      });
+    loadParticipants().then(() => {
+        html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
+          .catch(err => {
+            console.warn('Falling back to default camera', err);
+            html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess)
+              .catch(err2 => console.error(err2));
+          });
+    });
     </script>
 </body>
 </html>
