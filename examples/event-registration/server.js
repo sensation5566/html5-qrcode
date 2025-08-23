@@ -11,6 +11,13 @@ const CHECKIN_FILE = path.join(__dirname, 'checkin.log');
 let checkins = {};
 let registered = new Set();
 
+function logAction(message) {
+  const time = new Date()
+    .toLocaleString('sv-SE', { timeZone: 'Asia/Taipei' })
+    .replace(/-/g, '/');
+  console.log(`[${time}] ${message}`);
+}
+
 function loadData() {
   if (!fs.existsSync(DATA_FILE)) return;
   const lines = fs.readFileSync(DATA_FILE, 'utf8').split('\n');
@@ -89,6 +96,7 @@ function handleApi(req, res, parsed) {
             return;
           }
         }
+        logAction(`編號${id} 使用者完成報到`);
         send(res, 200, { ok: true });
       } catch (e) {
         send(res, 400, { error: 'invalid json' });
@@ -118,6 +126,7 @@ function handleApi(req, res, parsed) {
         if (!already) {
           checkins[id][store - 1] = true;
           appendEvent(id, store);
+          logAction(`編號${id} 於店家${store}完成兌換`);
         }
         send(res, 200, { already, visits: checkins[id] });
       } catch (e) {
