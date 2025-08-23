@@ -52,9 +52,13 @@ function appendEvent(id, store) {
 }
 
 function appendRegistered(id) {
-  fs.appendFile(CHECKIN_FILE, id + '\n', err => {
-    if (err) console.error('Failed to persist check-in', err);
-  });
+  try {
+    fs.appendFileSync(CHECKIN_FILE, id + '\n');
+    return true;
+  } catch (e) {
+    console.error('Failed to persist check-in', e);
+    return false;
+  }
 }
 
 function send(res, status, data, contentType = 'application/json') {
@@ -78,8 +82,12 @@ function handleApi(req, res, parsed) {
           return;
         }
         if (!registered.has(id)) {
-          registered.add(id);
-          appendRegistered(id);
+          if (appendRegistered(id)) {
+            registered.add(id);
+          } else {
+            send(res, 500, { error: 'server error' });
+            return;
+          }
         }
         send(res, 200, { ok: true });
       } catch (e) {
