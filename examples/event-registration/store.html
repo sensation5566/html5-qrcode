@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Store Check-in</title>
+    <title>2025條通祭：店家兌換檢核頁面</title>
     <style>
         html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
         body {
@@ -107,8 +107,12 @@
     adjustStoreNameFont();
     window.addEventListener('resize', adjustStoreNameFont);
 
-    // Update this list with the participant IDs encoded in your QR codes
-    const PARTICIPANTS = ['P001','P002','P003'];
+    let PARTICIPANTS = [];
+    async function loadParticipants() {
+        const res = await fetch('participants.txt');
+        const text = await res.text();
+        PARTICIPANTS = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+    }
 
     async function updateCheckin(id) {
         const res = await fetch('/checkin', {
@@ -187,12 +191,14 @@
     const html5QrCode = new Html5Qrcode('qr-reader');
     const config = { fps: 10, qrbox: qrboxFunction, aspectRatio: 1.0 };
 
-    html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
-      .catch(err => {
-        console.warn('Falling back to default camera', err);
-        html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess)
-          .catch(err2 => console.error(err2));
-      });
+    loadParticipants().then(() => {
+        html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
+          .catch(err => {
+            console.warn('Falling back to default camera', err);
+            html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess)
+              .catch(err2 => console.error(err2));
+          });
+    });
     </script>
 </body>
 </html>

@@ -3,90 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Participant Portal</title>
+    <title>2025條通祭：微醺散步兌換進度</title>
     <style>
-        html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
+        html, body { width:100%; height:100%; margin:0; padding:0; }
         body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #333;
-            background-image: url('img/bg.png');
-            background-repeat: no-repeat;
-            background-position: top center;
-            background-size: auto 100%;
+            display:flex;
+            justify-content:center;
+            align-items:flex-start;
+            padding-top:30vh;
+            background-color:#333;
+            background-image:url('img/bg.png');
+            background-repeat:no-repeat;
+            background-position:top center;
+            background-size:auto 100%;
+            font-family:sans-serif;
+            color:#fff;
         }
         @media (max-width: 999px) {
             body {
-                background-size: 100% auto;
-                background-position: center 15%;
-                overflow: hidden;
+                background-size:100% auto;
+                background-position:center 15%;
+                overflow:hidden;
             }
         }
-        #main-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 1em;
-            box-sizing: border-box;
-            text-align: center;
-            color: #fff;
+        #main {
+            width:100%;
+            max-width:400px;
+            text-align:center;
         }
-        #camera-wrapper {
-            position: relative;
-            width: 80%;
-            background: url('img/camera.png') no-repeat center center;
-            margin: 0 auto;
-            background-size: 76% 97%;
-            margin: 0 auto;
-            padding-top: 10%;
-            padding-right: 3%;
-            padding-bottom: 3%;
+        #img-wrapper {
+            position:relative;
+            text-align:center;
         }
-        #qr-reader {
-            width: 70%;
-            margin: auto;
-            aspect-ratio: 1 / 1;
-            overflow: hidden;
+        #img-wrapper img {
+            width:70%;
+            display:block;
+            margin:0 auto;
         }
-        #qr-reader video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            min-width: 100%;
-            min-height: 100%;
-            object-fit: cover;
+        #participant-input {
+            position:absolute;
+            left:10%;
+            top:35%;
+            width:50%;
+            background:transparent;
+            border:none;
+            font-size:1.1em;
+            text-align:center;
+            color:#000;
+            outline:none;
         }
-        h1 {
-            color: #ffffff;
+        #submit-area {
+            position:absolute;
+            top:0;
+            right:12%;
+            width:25%;
+            height:100%;
+            cursor:pointer;
         }
         #info {
-            margin-top: 20px;
-            font-weight: bold;
+            margin-top:20px;
+            font-weight:bold;
+            min-height:1.5em;
         }
         #list {
-            margin-top: 10px;
-            max-height: 6em;
-            overflow-y: auto;
+            margin-top:10px;
+            height:12em;
+            max-height:12em;
+            overflow-y:auto;
+            visibility:hidden;
+        }
+        #prompt {
+            margin-bottom:10px;
+            font-weight:bold;
         }
     </style>
 </head>
 <body>
-    <div id="main-container">
-        <p></p>
-        <h1 style="padding-top: 1.5em;">Participant Portal</h1>
-        <div id="camera-wrapper">
-            <div id="qr-reader"></div>
+    <div id="main">
+        <div id="prompt">請輸入您的ID</div>
+        <div id="img-wrapper">
+            <img src="img/store_id.png" alt="Participant ID">
+            <input id="participant-input" type="text" pattern="[A-Za-z0-9]*" maxlength="20" />
+            <div id="submit-area"></div>
         </div>
         <div id="info"></div>
         <div id="list"></div>
     </div>
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
     const TOTAL_STORES = 47;
     let STORE_NAMES = [];
-    const PARTICIPANTS = ['P001','P002','P003'];
+    let PARTICIPANTS = [];
+
+    async function loadParticipants() {
+        const res = await fetch('participants.txt');
+        const text = await res.text();
+        PARTICIPANTS = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+    }
 
     async function loadStoreNames() {
         const res = await fetch('store_table.txt');
@@ -102,58 +114,52 @@
         return data.visits || new Array(TOTAL_STORES).fill(false);
     }
 
+    async function hasCheckedIn(id) {
+        try {
+            const res = await fetch('/checkin.log', { cache: 'no-store' });
+            if (!res.ok) return false;
+            const text = await res.text();
+            return text.split('\n').some(line => line.trim() === id);
+        } catch (e) {
+            return false;
+        }
+    }
+
     function setInfo(msg) {
         document.getElementById('info').textContent = msg;
     }
 
     function setList(names) {
-        const listEl = document.getElementById('list');
-        listEl.innerHTML = names.join('<br>');
+        const list = document.getElementById('list');
+        list.innerHTML = names.join('<br>');
+        list.style.visibility = names.length ? 'visible' : 'hidden';
     }
 
-    let resumeTimeout = null;
-    async function onScanSuccess(decodedText) {
-        if (resumeTimeout) return;
-        if (!PARTICIPANTS.includes(decodedText)) {
-            setInfo('Invalid');
-            setList([]);
-            return;
-        }
-        html5QrCode.pause(true);
-        try {
-            const visits = await getCheckins(decodedText);
-            const count = visits.filter(v => v).length;
-            setInfo(`Visited ${count} store(s)`);
-            const names = STORE_NAMES.filter((_, i) => visits[i]);
-            setList(names);
-        } catch (e) {
-            setInfo('Server error');
-            setList([]);
-        }
-        resumeTimeout = setTimeout(() => {
-            html5QrCode.resume();
-            resumeTimeout = null;
-        }, 3000);
-    }
-
-    const qrboxFunction = function(viewfinderWidth, viewfinderHeight) {
-        let minEdgePercentage = 0.7; // 70%
-        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-        let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
-        return { width: qrboxSize, height: qrboxSize };
-    };
-
-    const html5QrCode = new Html5Qrcode('qr-reader');
-    const config = { fps: 10, qrbox: qrboxFunction, aspectRatio: 1.0 };
-
-    loadStoreNames().then(() => {
-        html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess)
-          .catch(err => {
-            console.warn('Falling back to default camera', err);
-            html5QrCode.start({ facingMode: 'user' }, config, onScanSuccess)
-              .catch(err2 => console.error(err2));
-          });
+    Promise.all([loadStoreNames(), loadParticipants()]).then(() => {
+        document.getElementById('submit-area').addEventListener('click', async () => {
+            const val = document.getElementById('participant-input').value.trim();
+            if (!PARTICIPANTS.includes(val)) {
+                setInfo('Invalid ID');
+                setList([]);
+                return;
+            }
+            if (!await hasCheckedIn(val)) {
+                setInfo('您尚未報到，請至報到處完成');
+                setList([]);
+                return;
+            }
+            try {
+                const visits = await getCheckins(val);
+                const names = STORE_NAMES.filter((_, i) => visits[i]);
+                setInfo(`已於 ${names.length} 間店兌換：`);
+                setList(names);
+            } catch (e) {
+                setInfo('Server error');
+                setList([]);
+            }
+        });
     });
     </script>
 </body>
 </html>
+
